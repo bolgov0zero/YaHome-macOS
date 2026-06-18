@@ -1,0 +1,57 @@
+name: Build & Release
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-15
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Select Xcode
+        run: sudo xcode-select -s /Applications/Xcode_16.app
+
+      - name: Build archive
+        run: |
+          xcodebuild archive \
+            -project YaHome.xcodeproj \
+            -scheme YaHome \
+            -configuration Release \
+            -archivePath build/YaHome.xcarchive \
+            CODE_SIGN_IDENTITY="-" \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO \
+            SKIP_INSTALL=NO
+
+      - name: Export app
+        run: |
+          cp -R build/YaHome.xcarchive/Products/Applications/YaHome.app build/YaHome.app
+
+      - name: Create DMG
+        run: |
+          hdiutil create -volname "YaHome" \
+            -srcfolder build/YaHome.app \
+            -ov -format UDZO \
+            build/YaHome.dmg
+
+      - name: Get version
+        id: version
+        run: |
+          SHORT=$(git rev-parse --short HEAD)
+          DATE=$(date +'%Y.%m.%d')
+          echo "tag=v${DATE}-${SHORT}" >> $GITHUB_OUTPUT
+          echo "name=YaHome ${DATE}" >> $GITHUB_OUTPUT
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.version.outputs.tag }}
+          name: ${{ steps.version.outputs.name }}
+          files: build/YaHome.dmg
+          generate_release_notes: true
