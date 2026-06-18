@@ -372,7 +372,7 @@ struct ModeMenuView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
-            ForEach(device.modeCapabilities, id: \.type) { cap in
+            ForEach(Array(device.modeCapabilities.enumerated()), id: \.offset) { _, cap in
                 if let params = cap.parameters, let modes = params.modes, let inst = params.instance {
                     Text(inst.capitalized).font(.caption.bold()).foregroundStyle(.secondary)
                     ForEach(modes) { mode in
