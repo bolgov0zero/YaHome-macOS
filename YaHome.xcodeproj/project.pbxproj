@@ -18,6 +18,7 @@
 		A009 /* DeviceCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F009 /* DeviceCardView.swift */; };
 		A010 /* SensorHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F010 /* SensorHistoryView.swift */; };
 		A011 /* MenuBarManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F011 /* MenuBarManager.swift */; };
+		A012 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F012 /* SettingsView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -32,6 +33,7 @@
 		F009 /* DeviceCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceCardView.swift; sourceTree = "<group>"; };
 		F010 /* SensorHistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SensorHistoryView.swift; sourceTree = "<group>"; };
 		F011 /* MenuBarManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarManager.swift; sourceTree = "<group>"; };
+		F012 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		FPROD /* YaHome.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = YaHome.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -104,6 +106,7 @@
 				F008 /* DashboardView.swift */,
 				F009 /* DeviceCardView.swift */,
 				F010 /* SensorHistoryView.swift */,
+				F012 /* SettingsView.swift */,
 			);
 			name = Views;
 			path = Sources/YaHome/Views;
@@ -177,6 +180,7 @@
 				A009 /* DeviceCardView.swift in Sources */,
 				A010 /* SensorHistoryView.swift in Sources */,
 				A011 /* MenuBarManager.swift in Sources */,
+				A012 /* SettingsView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
