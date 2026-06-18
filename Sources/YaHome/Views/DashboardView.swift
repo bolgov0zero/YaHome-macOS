@@ -3,16 +3,22 @@ import SwiftUI
 struct DashboardView: View {
     @EnvironmentObject var state: AppState
     @State private var showAllDevices = false
+    @State private var showSettings = false
 
     var info: UserInfoResponse { state.userInfo! }
 
+    private var favSensors: [Device] {
+        info.devices.filter { $0.isSensor && state.favorites.contains($0.id) }
+    }
     private var favDevices: [Device] {
-        info.devices.filter { state.favorites.contains($0.id) }
+        info.devices.filter { $0.isToggleable && state.favorites.contains($0.id) }
     }
     private var favScenarios: [Scenario] {
         info.scenarios.filter { state.favorites.contains($0.id) }
     }
-    private var hasFavorites: Bool { !favDevices.isEmpty || !favScenarios.isEmpty }
+    private var hasFavorites: Bool {
+        !favSensors.isEmpty || !favDevices.isEmpty || !favScenarios.isEmpty
+    }
 
     let columns = [GridItem(.adaptive(minimum: 180, maximum: 240), spacing: 10)]
 
@@ -21,9 +27,9 @@ struct DashboardView: View {
             topBar
             Divider()
             ScrollView {
-                VStack(alignment: .leading, spacing: 28) {
+                VStack(alignment: .leading, spacing: 24) {
                     if hasFavorites {
-                        favoritesSection
+                        favoritesContent
                     } else {
                         emptyFavoritesHint
                     }
@@ -35,18 +41,24 @@ struct DashboardView: View {
             ToolbarItem(placement: .automatic) {
                 Button { Task { await state.refresh() } } label: {
                     Image(systemName: "arrow.clockwise")
-                }
-                .help("Обновить")
+                }.help("Обновить")
+            }
+            ToolbarItem(placement: .automatic) {
+                Button { showSettings = true } label: {
+                    Image(systemName: "gearshape")
+                }.help("Настройки")
             }
             ToolbarItem(placement: .automatic) {
                 Button { state.logout() } label: {
                     Image(systemName: "rectangle.portrait.and.arrow.right")
-                }
-                .help("Выйти")
+                }.help("Выйти")
             }
         }
         .sheet(isPresented: $showAllDevices) {
             AllDevicesSheet().environmentObject(state)
+        }
+        .sheet(isPresented: $showSettings) {
+            SettingsView().environmentObject(state)
         }
     }
 
@@ -54,8 +66,7 @@ struct DashboardView: View {
     private var topBar: some View {
         HStack(spacing: 12) {
             VStack(alignment: .leading, spacing: 1) {
-                Text("Умный дом")
-                    .font(.system(size: 15, weight: .semibold))
+                Text("Умный дом").font(.system(size: 15, weight: .semibold))
                 Text("\(info.devices.count) устройств · \(info.scenarios.count) сценариев")
                     .font(.caption).foregroundStyle(.secondary)
             }
@@ -69,25 +80,29 @@ struct DashboardView: View {
             .foregroundStyle(.primary)
             .controlSize(.small)
         }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 10)
+        .padding(.horizontal, 16).padding(.vertical, 10)
         .background(Color(nsColor: .windowBackgroundColor))
     }
 
-    // MARK: - Favorites section
-    private var favoritesSection: some View {
-        VStack(alignment: .leading, spacing: 20) {
-            if !favDevices.isEmpty {
-                sectionHeader("Избранное")
-                LazyVGrid(columns: columns, spacing: 10) {
-                    ForEach(favDevices) { DeviceCardView(device: $0).environmentObject(state) }
-                }
+    // MARK: - Favorites content
+    @ViewBuilder
+    private var favoritesContent: some View {
+        if !favSensors.isEmpty {
+            sectionHeader("Датчики")
+            VStack(spacing: 6) {
+                ForEach(favSensors) { CompactSensorRow(device: $0).environmentObject(state) }
             }
-            if !favScenarios.isEmpty {
-                sectionHeader("Сценарии")
-                VStack(spacing: 6) {
-                    ForEach(favScenarios) { ScenarioCardView(scenario: $0).environmentObject(state) }
-                }
+        }
+        if !favDevices.isEmpty {
+            sectionHeader(favSensors.isEmpty ? "Устройства" : "Устройства")
+            LazyVGrid(columns: columns, spacing: 10) {
+                ForEach(favDevices) { DeviceCardView(device: $0).environmentObject(state) }
+            }
+        }
+        if !favScenarios.isEmpty {
+            sectionHeader("Сценарии")
+            VStack(spacing: 6) {
+                ForEach(favScenarios) { ScenarioCardView(scenario: $0).environmentObject(state) }
             }
         }
     }
@@ -97,29 +112,27 @@ struct DashboardView: View {
         VStack(spacing: 16) {
             Image(systemName: "star.square.on.square")
                 .font(.system(size: 48, weight: .thin))
-                .foregroundStyle(.secondary.opacity(0.5))
+                .foregroundStyle(.secondary.opacity(0.4))
             VStack(spacing: 6) {
-                Text("Нет избранных устройств")
-                    .font(.headline)
-                Text("Откройте все устройства и отметьте нужные звёздочкой — они появятся здесь.")
+                Text("Нет избранных").font(.headline)
+                Text("Откройте все устройства и отметьте нужные звёздочкой.")
                     .font(.callout).foregroundStyle(.secondary)
-                    .multilineTextAlignment(.center)
-                    .frame(maxWidth: 320)
+                    .multilineTextAlignment(.center).frame(maxWidth: 300)
             }
             Button { showAllDevices = true } label: {
                 Label("Открыть все устройства", systemImage: "square.grid.2x2")
             }
-            .buttonStyle(.borderedProminent)
-            .tint(.orange)
+            .buttonStyle(.borderedProminent).tint(.orange)
         }
-        .frame(maxWidth: .infinity)
-        .padding(.top, 60)
+        .frame(maxWidth: .infinity).padding(.top, 60)
     }
 
     private func sectionHeader(_ title: String) -> some View {
         Text(title)
-            .font(.system(size: 13, weight: .semibold))
+            .font(.system(size: 11, weight: .semibold))
             .foregroundStyle(.secondary)
+            .textCase(.uppercase)
+            .kerning(0.5)
             .padding(.horizontal, 2)
     }
 }
@@ -188,9 +201,7 @@ struct AllDevicesSheet: View {
                     }
                     if sensors.isEmpty && toggleables.isEmpty && scenarios.isEmpty {
                         Text("Ничего не найдено")
-                            .foregroundStyle(.secondary)
-                            .frame(maxWidth: .infinity)
-                            .padding(.top, 40)
+                            .foregroundStyle(.secondary).frame(maxWidth: .infinity).padding(.top, 40)
                     }
                 }
                 .padding(16)
@@ -220,8 +231,7 @@ struct AllDevicesSheet: View {
             .clipShape(Capsule())
 
             Button { dismiss() } label: {
-                Image(systemName: "xmark.circle.fill")
-                    .font(.title3).foregroundStyle(.secondary)
+                Image(systemName: "xmark.circle.fill").font(.title3).foregroundStyle(.secondary)
             }.buttonStyle(.plain)
         }
         .padding(.horizontal, 16).padding(.vertical, 10)
@@ -249,14 +259,14 @@ struct AllDevicesSheet: View {
                 .background(selected ? Color.orange : Color(nsColor: .controlBackgroundColor))
                 .foregroundStyle(selected ? .white : .primary)
                 .clipShape(Capsule())
-        }
-        .buttonStyle(.plain)
+        }.buttonStyle(.plain)
     }
 
     @ViewBuilder
     private func sheetSection<Content: View>(_ title: String, @ViewBuilder content: () -> Content) -> some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text(title).font(.system(size: 13, weight: .semibold)).foregroundStyle(.secondary)
+            Text(title).font(.system(size: 11, weight: .semibold))
+                .foregroundStyle(.secondary).textCase(.uppercase).kerning(0.5)
             content()
         }
     }

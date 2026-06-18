@@ -40,7 +40,7 @@ struct ContentView: View {
     }
 }
 
-// MARK: - Window accessor (captures NSWindow reference)
+// MARK: - Window accessor
 struct WindowAccessor: NSViewRepresentable {
     let callback: (NSWindow) -> Void
     func makeNSView(context: Context) -> NSView {
@@ -65,6 +65,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
     private let windowDelegate = HideOnCloseDelegate()
 
+    func applicationWillFinishLaunching(_ notification: Notification) {
+        // Hide from dock before any window appears
+        NSApp.setActivationPolicy(.accessory)
+    }
+
+    func applicationDidFinishLaunching(_ notification: Notification) {
+        // Close all windows — app lives in menu bar only
+        NSApp.windows.forEach { $0.orderOut(nil) }
+    }
+
     @MainActor func setup(appState: AppState) {
         guard menuBarManager == nil else { return }
         menuBarManager = MenuBarManager(appState: appState, appDelegate: self)
@@ -72,11 +82,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool { false }
 
-    func applicationDidFinishLaunching(_ notification: Notification) {
-        NSApp.setActivationPolicy(.accessory)
-    }
-
     func showMainWindow() {
+        NSApp.setActivationPolicy(.regular)
         NSApp.activate(ignoringOtherApps: true)
         if let w = mainWindow {
             w.makeKeyAndOrderFront(nil)
@@ -86,10 +93,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 }
 
-// Intercept window close → hide instead
+// Intercept window close → hide instead, revert to accessory mode
 final class HideOnCloseDelegate: NSObject, NSWindowDelegate {
     func windowShouldClose(_ sender: NSWindow) -> Bool {
         sender.orderOut(nil)
+        NSApp.setActivationPolicy(.accessory)
         return false
     }
 }

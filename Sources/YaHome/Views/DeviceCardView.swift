@@ -1,10 +1,103 @@
 import SwiftUI
 
-// MARK: - Device Card
+// MARK: - Compact Sensor Row (for favorites)
+
+struct CompactSensorRow: View {
+    let device: Device
+    @EnvironmentObject var state: AppState
+
+    private var favProp: FavoriteProp? { state.favProp(for: device.id) }
+    private var room: String? { state.roomName(for: device) }
+
+    var body: some View {
+        HStack(spacing: 10) {
+            ZStack {
+                RoundedRectangle(cornerRadius: 8)
+                    .fill(Color.blue.opacity(0.10))
+                    .frame(width: 30, height: 30)
+                Image(systemName: "sensor.fill")
+                    .font(.system(size: 13, weight: .medium))
+                    .foregroundStyle(.blue)
+            }
+
+            VStack(alignment: .leading, spacing: 1) {
+                Text(device.name)
+                    .font(.system(size: 12, weight: .semibold))
+                    .lineLimit(1)
+                if let r = room {
+                    Text(r).font(.system(size: 10)).foregroundStyle(.secondary)
+                }
+            }
+
+            Spacer()
+
+            HStack(spacing: 10) {
+                let prop = favProp?.property ?? .all
+                if prop != .humidity, let t = device.temperature {
+                    sensorValue(String(format: "%.1f°", t), icon: "thermometer.medium", color: .orange)
+                }
+                if prop != .temperature, let h = device.humidity {
+                    sensorValue(String(format: "%.0f%%", h), icon: "humidity.fill", color: .blue)
+                }
+            }
+
+            favMenuButton
+        }
+        .padding(.horizontal, 12).padding(.vertical, 8)
+        .background(
+            RoundedRectangle(cornerRadius: 10)
+                .fill(Color(nsColor: .controlBackgroundColor))
+                .overlay(RoundedRectangle(cornerRadius: 10).strokeBorder(Color.primary.opacity(0.06), lineWidth: 1))
+        )
+    }
+
+    @ViewBuilder
+    private func sensorValue(_ text: String, icon: String, color: Color) -> some View {
+        HStack(spacing: 3) {
+            Image(systemName: icon).font(.system(size: 10)).foregroundStyle(color.opacity(0.8))
+            Text(text).font(.system(size: 13, weight: .semibold, design: .rounded)).foregroundStyle(color)
+        }
+    }
+
+    @ViewBuilder
+    private var favMenuButton: some View {
+        let isFav = state.favorites.contains(device.id)
+        if device.temperature != nil && device.humidity != nil {
+            Menu {
+                Button { state.toggleFavProp(deviceId: device.id, key: .all) } label: {
+                    Label("Оба значения", systemImage: favProp?.property == .all ? "checkmark" : "")
+                }
+                Button { state.toggleFavProp(deviceId: device.id, key: .temperature) } label: {
+                    Label("Только температура", systemImage: favProp?.property == .temperature ? "checkmark" : "")
+                }
+                Button { state.toggleFavProp(deviceId: device.id, key: .humidity) } label: {
+                    Label("Только влажность", systemImage: favProp?.property == .humidity ? "checkmark" : "")
+                }
+                Divider()
+                if isFav {
+                    Button(role: .destructive) { state.toggleFavorite(device.id) } label: {
+                        Label("Убрать из избранного", systemImage: "star.slash")
+                    }
+                }
+            } label: {
+                Image(systemName: isFav ? "star.fill" : "star")
+                    .font(.system(size: 11)).foregroundStyle(isFav ? .yellow : .secondary)
+            }
+            .menuStyle(.borderlessButton)
+            .fixedSize()
+        } else {
+            Button { state.toggleFavorite(device.id) } label: {
+                Image(systemName: isFav ? "star.fill" : "star")
+                    .font(.system(size: 11)).foregroundStyle(isFav ? .yellow : .secondary)
+            }.buttonStyle(.plain)
+        }
+    }
+}
+
+// MARK: - Device Card (full, for AllDevicesSheet)
 
 struct DeviceCardView: View {
     let device: Device
-    var compact: Bool = false
     @EnvironmentObject var state: AppState
     @State private var showHistory = false
     @State private var showModePopover = false
@@ -14,17 +107,12 @@ struct DeviceCardView: View {
     private var room: String? { state.roomName(for: device) }
 
     var body: some View {
-        if device.isSensor {
-            sensorCard
-        } else {
-            toggleCard
-        }
+        if device.isSensor { sensorCard } else { toggleCard }
     }
 
     // MARK: - Sensor card
     private var sensorCard: some View {
         VStack(alignment: .leading, spacing: 0) {
-            // Header
             HStack(alignment: .top, spacing: 8) {
                 ZStack {
                     RoundedRectangle(cornerRadius: 10)
@@ -37,11 +125,8 @@ struct DeviceCardView: View {
                 VStack(alignment: .leading, spacing: 2) {
                     Text(device.name)
                         .font(.system(size: 13, weight: .semibold))
-                        .lineLimit(2)
-                        .fixedSize(horizontal: false, vertical: true)
-                    if let r = room {
-                        Text(r).font(.system(size: 11)).foregroundStyle(.secondary)
-                    }
+                        .lineLimit(2).fixedSize(horizontal: false, vertical: true)
+                    if let r = room { Text(r).font(.system(size: 11)).foregroundStyle(.secondary) }
                 }
                 Spacer()
                 favButton
@@ -50,7 +135,6 @@ struct DeviceCardView: View {
 
             Spacer(minLength: 10)
 
-            // Values
             HStack(spacing: 16) {
                 if let t = device.temperature {
                     valueChip(value: String(format: "%.1f°", t), icon: "thermometer.medium", color: .orange)
@@ -61,7 +145,6 @@ struct DeviceCardView: View {
             }
             .padding(.horizontal, 14)
 
-            // Graph button
             Button { showHistory = true } label: {
                 HStack(spacing: 4) {
                     Image(systemName: "chart.xyaxis.line").font(.system(size: 10))
@@ -98,8 +181,7 @@ struct DeviceCardView: View {
                     if !device.modeCapabilities.isEmpty {
                         Button { showModePopover = true } label: {
                             Image(systemName: "slider.horizontal.3")
-                                .font(.system(size: 12))
-                                .foregroundStyle(.secondary)
+                                .font(.system(size: 12)).foregroundStyle(.secondary)
                         }
                         .buttonStyle(.plain)
                         .popover(isPresented: $showModePopover) {
@@ -114,18 +196,13 @@ struct DeviceCardView: View {
             Spacer(minLength: 8)
 
             VStack(alignment: .leading, spacing: 2) {
-                Text(device.name)
-                    .font(.system(size: 13, weight: .semibold))
-                    .lineLimit(2)
-                if let r = room {
-                    Text(r).font(.system(size: 11)).foregroundStyle(.secondary)
-                }
+                Text(device.name).font(.system(size: 13, weight: .semibold)).lineLimit(2)
+                if let r = room { Text(r).font(.system(size: 11)).foregroundStyle(.secondary) }
             }
             .padding(.horizontal, 14)
 
             Spacer(minLength: 8)
 
-            // Toggle
             HStack {
                 Text(device.isOn ? "Вкл" : "Выкл")
                     .font(.system(size: 11, weight: .medium))
@@ -135,9 +212,7 @@ struct DeviceCardView: View {
                     get: { device.isOn },
                     set: { _ in Task { await state.toggle(device: device) } }
                 ))
-                .toggleStyle(.switch)
-                .controlSize(.mini)
-                .tint(.orange)
+                .toggleStyle(.switch).controlSize(.mini).tint(.orange)
             }
             .padding(.horizontal, 14).padding(.bottom, 14)
         }
@@ -148,24 +223,18 @@ struct DeviceCardView: View {
         .onTapGesture { Task { await state.toggle(device: device) } }
     }
 
-    // MARK: - Helpers
+    // MARK: - Fav button
     @ViewBuilder
     private var favButton: some View {
         if device.isSensor && (device.temperature != nil && device.humidity != nil) {
             Menu {
-                Button {
-                    state.toggleFavProp(deviceId: device.id, key: .all)
-                } label: {
+                Button { state.toggleFavProp(deviceId: device.id, key: .all) } label: {
                     Label("Оба значения", systemImage: favProp?.property == .all ? "checkmark" : "")
                 }
-                Button {
-                    state.toggleFavProp(deviceId: device.id, key: .temperature)
-                } label: {
+                Button { state.toggleFavProp(deviceId: device.id, key: .temperature) } label: {
                     Label("Только температура", systemImage: favProp?.property == .temperature ? "checkmark" : "")
                 }
-                Button {
-                    state.toggleFavProp(deviceId: device.id, key: .humidity)
-                } label: {
+                Button { state.toggleFavProp(deviceId: device.id, key: .humidity) } label: {
                     Label("Только влажность", systemImage: favProp?.property == .humidity ? "checkmark" : "")
                 }
                 Divider()
@@ -176,18 +245,14 @@ struct DeviceCardView: View {
                 }
             } label: {
                 Image(systemName: isFav ? "star.fill" : "star")
-                    .font(.system(size: 13))
-                    .foregroundStyle(isFav ? .yellow : .secondary)
+                    .font(.system(size: 13)).foregroundStyle(isFav ? .yellow : .secondary)
             }
-            .menuStyle(.borderlessButton)
-            .fixedSize()
+            .menuStyle(.borderlessButton).fixedSize()
         } else {
             Button { state.toggleFavorite(device.id) } label: {
                 Image(systemName: isFav ? "star.fill" : "star")
-                    .font(.system(size: 13))
-                    .foregroundStyle(isFav ? .yellow : .secondary)
-            }
-            .buttonStyle(.plain)
+                    .font(.system(size: 13)).foregroundStyle(isFav ? .yellow : .secondary)
+            }.buttonStyle(.plain)
         }
     }
 
@@ -196,18 +261,13 @@ struct DeviceCardView: View {
         HStack(spacing: 4) {
             Image(systemName: icon).font(.system(size: 11))
             Text(value).font(.system(size: 15, weight: .semibold, design: .rounded))
-        }
-        .foregroundStyle(color)
+        }.foregroundStyle(color)
     }
 
     private func cardBG(color: Color, active: Bool) -> some View {
         ZStack {
-            RoundedRectangle(cornerRadius: 16)
-                .fill(Color(nsColor: .controlBackgroundColor))
-            if active {
-                RoundedRectangle(cornerRadius: 16)
-                    .fill(color.opacity(0.07))
-            }
+            RoundedRectangle(cornerRadius: 16).fill(Color(nsColor: .controlBackgroundColor))
+            if active { RoundedRectangle(cornerRadius: 16).fill(color.opacity(0.07)) }
             RoundedRectangle(cornerRadius: 16)
                 .strokeBorder(active ? color.opacity(0.25) : Color.primary.opacity(0.06), lineWidth: 1)
         }
@@ -238,8 +298,7 @@ struct DeviceCardView: View {
                 }
                 Spacer()
                 Button { showHistory = false } label: {
-                    Image(systemName: "xmark.circle.fill")
-                        .font(.title3).foregroundStyle(.secondary)
+                    Image(systemName: "xmark.circle.fill").font(.title3).foregroundStyle(.secondary)
                 }.buttonStyle(.plain)
             }
             .padding()
@@ -247,7 +306,7 @@ struct DeviceCardView: View {
             SensorHistoryView(device: device,
                 singleProperty: favProp.flatMap {
                     $0.property == .temperature ? "temperature" :
-                    $0.property == .humidity ? "humidity" : nil
+                    $0.property == .humidity    ? "humidity" : nil
                 })
             .padding()
         }
@@ -266,21 +325,18 @@ struct ScenarioCardView: View {
     var body: some View {
         HStack(spacing: 12) {
             ZStack {
-                RoundedRectangle(cornerRadius: 10)
+                RoundedRectangle(cornerRadius: 8)
                     .fill(Color.purple.opacity(0.12))
-                    .frame(width: 36, height: 36)
-                Image(systemName: "play.fill")
-                    .font(.system(size: 14)).foregroundStyle(.purple)
+                    .frame(width: 30, height: 30)
+                Image(systemName: "play.fill").font(.system(size: 12)).foregroundStyle(.purple)
             }
 
-            Text(scenario.name)
-                .font(.system(size: 13, weight: .medium))
+            Text(scenario.name).font(.system(size: 13, weight: .medium))
             Spacer()
 
             Button { state.toggleFavorite(scenario.id) } label: {
                 Image(systemName: isFav ? "star.fill" : "star")
-                    .font(.system(size: 12))
-                    .foregroundStyle(isFav ? .yellow : .secondary)
+                    .font(.system(size: 11)).foregroundStyle(isFav ? .yellow : .secondary)
             }.buttonStyle(.plain)
 
             Button {
@@ -294,19 +350,16 @@ struct ScenarioCardView: View {
                 Group {
                     if isRunning { ProgressView().controlSize(.small) }
                     else { Text("Запустить").font(.system(size: 12, weight: .medium)) }
-                }
-                .frame(width: 72)
+                }.frame(width: 72)
             }
-            .buttonStyle(.borderedProminent)
-            .tint(.purple)
-            .controlSize(.small)
-            .disabled(isRunning)
+            .buttonStyle(.borderedProminent).tint(.purple)
+            .controlSize(.small).disabled(isRunning)
         }
-        .padding(.horizontal, 14).padding(.vertical, 10)
+        .padding(.horizontal, 12).padding(.vertical, 8)
         .background(
-            RoundedRectangle(cornerRadius: 12)
+            RoundedRectangle(cornerRadius: 10)
                 .fill(Color(nsColor: .controlBackgroundColor))
-                .overlay(RoundedRectangle(cornerRadius: 12).strokeBorder(Color.primary.opacity(0.06), lineWidth: 1))
+                .overlay(RoundedRectangle(cornerRadius: 10).strokeBorder(Color.primary.opacity(0.06), lineWidth: 1))
         )
     }
 }
