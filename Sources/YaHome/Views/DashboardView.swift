@@ -89,8 +89,8 @@ struct DashboardView: View {
     private var favoritesContent: some View {
         if !favSensors.isEmpty {
             sectionHeader("Датчики")
-            LazyVGrid(columns: columns, spacing: 10) {
-                ForEach(favSensors) { DeviceCardView(device: $0).environmentObject(state) }
+            LazyVGrid(columns: [GridItem(.adaptive(minimum: 130, maximum: 180), spacing: 10)], spacing: 10) {
+                ForEach(favSensors) { CompactSensorTile(device: $0).environmentObject(state) }
             }
         }
         if !favDevices.isEmpty {

@@ -1,90 +1,99 @@
 import SwiftUI
 
-// MARK: - Compact Sensor Row (for favorites)
+// MARK: - Compact Sensor Tile (for favorites grid)
 
-struct CompactSensorRow: View {
+struct CompactSensorTile: View {
     let device: Device
     @EnvironmentObject var state: AppState
 
     private var favProp: FavoriteProp? { state.favProp(for: device.id) }
+    private var prop: FavoriteProp.PropKey { favProp?.property ?? .all }
     private var room: String? { state.roomName(for: device) }
+    private var isFav: Bool { state.favorites.contains(device.id) }
 
     var body: some View {
-        HStack(spacing: 10) {
-            ZStack {
-                RoundedRectangle(cornerRadius: 8)
-                    .fill(Color.blue.opacity(0.10))
-                    .frame(width: 30, height: 30)
-                Image(systemName: "sensor.fill")
-                    .font(.system(size: 13, weight: .medium))
-                    .foregroundStyle(.blue)
+        VStack(alignment: .leading, spacing: 0) {
+            HStack(alignment: .top) {
+                ZStack {
+                    RoundedRectangle(cornerRadius: 8)
+                        .fill(Color.blue.opacity(0.10))
+                        .frame(width: 28, height: 28)
+                    Image(systemName: "sensor.fill")
+                        .font(.system(size: 12, weight: .medium))
+                        .foregroundStyle(.blue)
+                }
+                Spacer()
+                favMenuButton
             }
+            .padding(.horizontal, 10).padding(.top, 10)
+
+            Spacer(minLength: 6)
+
+            VStack(alignment: .leading, spacing: 2) {
+                if prop != .humidity, let t = device.temperature {
+                    HStack(alignment: .firstTextBaseline, spacing: 2) {
+                        Text(String(format: "%.1f", t))
+                            .font(.system(size: 22, weight: .bold, design: .rounded))
+                            .foregroundStyle(.orange)
+                        Text("°C")
+                            .font(.system(size: 12, weight: .medium, design: .rounded))
+                            .foregroundStyle(.orange.opacity(0.7))
+                    }
+                }
+                if prop != .temperature, let h = device.humidity {
+                    HStack(alignment: .firstTextBaseline, spacing: 2) {
+                        Text(String(format: "%.0f", h))
+                            .font(.system(size: 22, weight: .bold, design: .rounded))
+                            .foregroundStyle(.blue)
+                        Text("%")
+                            .font(.system(size: 12, weight: .medium, design: .rounded))
+                            .foregroundStyle(.blue.opacity(0.7))
+                    }
+                }
+            }
+            .padding(.horizontal, 10)
+
+            Spacer(minLength: 6)
 
             VStack(alignment: .leading, spacing: 1) {
                 Text(device.name)
-                    .font(.system(size: 12, weight: .semibold))
+                    .font(.system(size: 11, weight: .semibold))
                     .lineLimit(1)
                 if let r = room {
-                    Text(r).font(.system(size: 10)).foregroundStyle(.secondary)
+                    Text(r).font(.system(size: 10)).foregroundStyle(.secondary).lineLimit(1)
                 }
             }
-
-            Spacer()
-
-            HStack(spacing: 10) {
-                let prop = favProp?.property ?? .all
-                if prop != .humidity, let t = device.temperature {
-                    sensorValue(String(format: "%.1f°", t), icon: "thermometer.medium", color: .orange)
-                }
-                if prop != .temperature, let h = device.humidity {
-                    sensorValue(String(format: "%.0f%%", h), icon: "humidity.fill", color: .blue)
-                }
-            }
-
-            favMenuButton
+            .padding(.horizontal, 10).padding(.bottom, 10)
         }
-        .padding(.horizontal, 12).padding(.vertical, 8)
+        .frame(maxWidth: .infinity, minHeight: 110, alignment: .leading)
         .background(
-            RoundedRectangle(cornerRadius: 10)
+            RoundedRectangle(cornerRadius: 14)
                 .fill(Color(nsColor: .controlBackgroundColor))
-                .overlay(RoundedRectangle(cornerRadius: 10).strokeBorder(Color.primary.opacity(0.06), lineWidth: 1))
+                .overlay(RoundedRectangle(cornerRadius: 14).strokeBorder(Color.primary.opacity(0.06), lineWidth: 1))
         )
     }
 
     @ViewBuilder
-    private func sensorValue(_ text: String, icon: String, color: Color) -> some View {
-        HStack(spacing: 3) {
-            Image(systemName: icon).font(.system(size: 10)).foregroundStyle(color.opacity(0.8))
-            Text(text).font(.system(size: 13, weight: .semibold, design: .rounded)).foregroundStyle(color)
-        }
-    }
-
-    @ViewBuilder
     private var favMenuButton: some View {
-        let isFav = state.favorites.contains(device.id)
         if device.temperature != nil && device.humidity != nil {
             Menu {
                 Button { state.toggleFavProp(deviceId: device.id, key: .all) } label: {
-                    Label("Оба значения", systemImage: favProp?.property == .all ? "checkmark" : "")
+                    Label("Оба значения", systemImage: prop == .all ? "checkmark" : "")
                 }
                 Button { state.toggleFavProp(deviceId: device.id, key: .temperature) } label: {
-                    Label("Только температура", systemImage: favProp?.property == .temperature ? "checkmark" : "")
+                    Label("Только температура", systemImage: prop == .temperature ? "checkmark" : "")
                 }
                 Button { state.toggleFavProp(deviceId: device.id, key: .humidity) } label: {
-                    Label("Только влажность", systemImage: favProp?.property == .humidity ? "checkmark" : "")
+                    Label("Только влажность", systemImage: prop == .humidity ? "checkmark" : "")
                 }
                 Divider()
-                if isFav {
-                    Button(role: .destructive) { state.toggleFavorite(device.id) } label: {
-                        Label("Убрать из избранного", systemImage: "star.slash")
-                    }
+                Button(role: .destructive) { state.toggleFavorite(device.id) } label: {
+                    Label("Убрать из избранного", systemImage: "star.slash")
                 }
             } label: {
-                Image(systemName: isFav ? "star.fill" : "star")
-                    .font(.system(size: 11)).foregroundStyle(isFav ? .yellow : .secondary)
+                Image(systemName: "star.fill").font(.system(size: 11)).foregroundStyle(.yellow)
             }
-            .menuStyle(.borderlessButton)
-            .fixedSize()
+            .menuStyle(.borderlessButton).fixedSize()
         } else {
             Button { state.toggleFavorite(device.id) } label: {
                 Image(systemName: isFav ? "star.fill" : "star")
@@ -94,7 +103,7 @@ struct CompactSensorRow: View {
     }
 }
 
-// MARK: - Device Card (full, for AllDevicesSheet)
+// MARK: - Device Card (full, used in AllDevicesSheet)
 
 struct DeviceCardView: View {
     let device: Device
@@ -110,7 +119,6 @@ struct DeviceCardView: View {
         if device.isSensor { sensorCard } else { toggleCard }
     }
 
-    // MARK: - Sensor card
     private var sensorCard: some View {
         VStack(alignment: .leading, spacing: 0) {
             HStack(alignment: .top, spacing: 8) {
@@ -164,7 +172,6 @@ struct DeviceCardView: View {
         .sheet(isPresented: $showHistory) { historySheet }
     }
 
-    // MARK: - Toggle card
     private var toggleCard: some View {
         VStack(alignment: .leading, spacing: 0) {
             HStack(alignment: .top) {
@@ -223,10 +230,9 @@ struct DeviceCardView: View {
         .onTapGesture { Task { await state.toggle(device: device) } }
     }
 
-    // MARK: - Fav button
     @ViewBuilder
     private var favButton: some View {
-        if device.isSensor && (device.temperature != nil && device.humidity != nil) {
+        if device.isSensor && device.temperature != nil && device.humidity != nil {
             Menu {
                 Button { state.toggleFavProp(deviceId: device.id, key: .all) } label: {
                     Label("Оба значения", systemImage: favProp?.property == .all ? "checkmark" : "")
@@ -315,6 +321,7 @@ struct DeviceCardView: View {
 }
 
 // MARK: - Scenario Card
+
 struct ScenarioCardView: View {
     let scenario: Scenario
     @EnvironmentObject var state: AppState
@@ -330,15 +337,12 @@ struct ScenarioCardView: View {
                     .frame(width: 30, height: 30)
                 Image(systemName: "play.fill").font(.system(size: 12)).foregroundStyle(.purple)
             }
-
             Text(scenario.name).font(.system(size: 13, weight: .medium))
             Spacer()
-
             Button { state.toggleFavorite(scenario.id) } label: {
                 Image(systemName: isFav ? "star.fill" : "star")
                     .font(.system(size: 11)).foregroundStyle(isFav ? .yellow : .secondary)
             }.buttonStyle(.plain)
-
             Button {
                 isRunning = true
                 Task {
@@ -352,8 +356,7 @@ struct ScenarioCardView: View {
                     else { Text("Запустить").font(.system(size: 12, weight: .medium)) }
                 }.frame(width: 72)
             }
-            .buttonStyle(.borderedProminent).tint(.purple)
-            .controlSize(.small).disabled(isRunning)
+            .buttonStyle(.borderedProminent).tint(.purple).controlSize(.small).disabled(isRunning)
         }
         .padding(.horizontal, 12).padding(.vertical, 8)
         .background(
@@ -365,6 +368,7 @@ struct ScenarioCardView: View {
 }
 
 // MARK: - Mode Menu
+
 struct ModeMenuView: View {
     let device: Device
     @EnvironmentObject var state: AppState
