@@ -14,7 +14,7 @@ final class AppState: ObservableObject {
     @Published var userInfo: UserInfoResponse? = nil
     @Published var isLoading = false
     @Published var errorMessage: String? = nil
-    @Published var favorites: Set<String> = []       // device/scenario IDs (whole device)
+    @Published var favorites: [String] = []           // device/scenario IDs, ordered by insertion
     @Published var favProps: [FavoriteProp] = []     // property-level sensor favorites
     @Published var pinnedSensorId: String? = nil
     @Published var pinnedPropKey: FavoriteProp.PropKey = .all
@@ -124,9 +124,12 @@ final class AppState: ObservableObject {
 
     // MARK: - Favorites
     func toggleFavorite(_ id: String) {
-        if favorites.contains(id) { favorites.remove(id) } else { favorites.insert(id) }
-        // Remove property favorites if device removed
-        if !favorites.contains(id) { favProps.removeAll { $0.deviceId == id } }
+        if let idx = favorites.firstIndex(of: id) {
+            favorites.remove(at: idx)
+            favProps.removeAll { $0.deviceId == id }
+        } else {
+            favorites.append(id)
+        }
         savePreferences()
     }
 
@@ -136,7 +139,7 @@ final class AppState: ObservableObject {
         } else {
             favProps.removeAll { $0.deviceId == deviceId } // one prop per device
             favProps.append(FavoriteProp(deviceId: deviceId, property: key))
-            favorites.insert(deviceId)
+            if !favorites.contains(deviceId) { favorites.append(deviceId) }
         }
         savePreferences()
     }
@@ -171,7 +174,7 @@ final class AppState: ObservableObject {
     }
 
     private func savePreferences() {
-        let p = Prefs(favorites: Array(favorites), favProps: favProps,
+        let p = Prefs(favorites: favorites, favProps: favProps,
                       pinnedSensorId: pinnedSensorId, pinnedPropKey: pinnedPropKey)
         if let data = try? JSONEncoder().encode(p) { try? data.write(to: prefsURL) }
     }
@@ -179,7 +182,7 @@ final class AppState: ObservableObject {
     private func loadPreferences() {
         guard let data = try? Data(contentsOf: prefsURL),
               let p = try? JSONDecoder().decode(Prefs.self, from: data) else { return }
-        favorites = Set(p.favorites); favProps = p.favProps
+        favorites = p.favorites; favProps = p.favProps
         pinnedSensorId = p.pinnedSensorId; pinnedPropKey = p.pinnedPropKey
     }
 }

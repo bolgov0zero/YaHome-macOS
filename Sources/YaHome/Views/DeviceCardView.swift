@@ -5,6 +5,7 @@ import SwiftUI
 struct CompactSensorTile: View {
     let device: Device
     @EnvironmentObject var state: AppState
+    @State private var showHistory = false
 
     private var favProp: FavoriteProp? { state.favProp(for: device.id) }
     private var prop: FavoriteProp.PropKey { favProp?.property ?? .all }
@@ -55,13 +56,25 @@ struct CompactSensorTile: View {
 
             Spacer(minLength: 6)
 
-            VStack(alignment: .leading, spacing: 1) {
-                Text(device.name)
-                    .font(.system(size: 11, weight: .semibold))
-                    .lineLimit(1)
-                if let r = room {
-                    Text(r).font(.system(size: 10)).foregroundStyle(.secondary).lineLimit(1)
+            HStack(alignment: .bottom) {
+                VStack(alignment: .leading, spacing: 1) {
+                    Text(device.name)
+                        .font(.system(size: 11, weight: .semibold))
+                        .lineLimit(1)
+                    if let r = room {
+                        Text(r).font(.system(size: 10)).foregroundStyle(.secondary).lineLimit(1)
+                    }
                 }
+                Spacer()
+                Button { showHistory = true } label: {
+                    Image(systemName: "chart.xyaxis.line")
+                        .font(.system(size: 11))
+                        .foregroundStyle(.secondary)
+                        .padding(5)
+                        .background(Color.secondary.opacity(0.08))
+                        .clipShape(RoundedRectangle(cornerRadius: 6))
+                }
+                .buttonStyle(.plain)
             }
             .padding(.horizontal, 10).padding(.bottom, 10)
         }
@@ -71,6 +84,26 @@ struct CompactSensorTile: View {
                 .fill(Color(nsColor: .controlBackgroundColor))
                 .overlay(RoundedRectangle(cornerRadius: 14).strokeBorder(Color.primary.opacity(0.06), lineWidth: 1))
         )
+        .sheet(isPresented: $showHistory) {
+            VStack(alignment: .leading, spacing: 0) {
+                HStack {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(device.name).font(.headline)
+                        Text("История показаний").font(.subheadline).foregroundStyle(.secondary)
+                    }
+                    Spacer()
+                    Button { showHistory = false } label: {
+                        Image(systemName: "xmark.circle.fill").font(.title3).foregroundStyle(.secondary)
+                    }.buttonStyle(.plain)
+                }
+                .padding()
+                Divider()
+                SensorHistoryView(device: device,
+                    singleProperty: prop == .temperature ? "temperature" : prop == .humidity ? "humidity" : nil)
+                .padding()
+            }
+            .frame(width: 580, height: 360)
+        }
     }
 
     @ViewBuilder
