@@ -1,0 +1,289 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		A001 /* YaHomeApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = F001 /* YaHomeApp.swift */; };
+		A002 /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = F002 /* AppState.swift */; };
+		A003 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = F003 /* Models.swift */; };
+		A004 /* APIService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F004 /* APIService.swift */; };
+		A005 /* KeychainService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F005 /* KeychainService.swift */; };
+		A006 /* HistoryService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F006 /* HistoryService.swift */; };
+		A007 /* AuthView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F007 /* AuthView.swift */; };
+		A008 /* DashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F008 /* DashboardView.swift */; };
+		A009 /* DeviceCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F009 /* DeviceCardView.swift */; };
+		A010 /* SensorHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F010 /* SensorHistoryView.swift */; };
+		A011 /* MenuBarManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F011 /* MenuBarManager.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		F001 /* YaHomeApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YaHomeApp.swift; sourceTree = "<group>"; };
+		F002 /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
+		F003 /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
+		F004 /* APIService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIService.swift; sourceTree = "<group>"; };
+		F005 /* KeychainService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainService.swift; sourceTree = "<group>"; };
+		F006 /* HistoryService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryService.swift; sourceTree = "<group>"; };
+		F007 /* AuthView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthView.swift; sourceTree = "<group>"; };
+		F008 /* DashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardView.swift; sourceTree = "<group>"; };
+		F009 /* DeviceCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceCardView.swift; sourceTree = "<group>"; };
+		F010 /* SensorHistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SensorHistoryView.swift; sourceTree = "<group>"; };
+		F011 /* MenuBarManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarManager.swift; sourceTree = "<group>"; };
+		FPROD /* YaHome.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = YaHome.app; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		PH_FW /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		GRP_APP /* App */ = {
+			isa = PBXGroup;
+			children = (
+				F001 /* YaHomeApp.swift */,
+				F002 /* AppState.swift */,
+			);
+			name = App;
+			path = Sources/YaHome/App;
+			sourceTree = "<group>";
+		};
+		GRP_MENU /* MenuBar */ = {
+			isa = PBXGroup;
+			children = (
+				F011 /* MenuBarManager.swift */,
+			);
+			name = MenuBar;
+			path = Sources/YaHome/MenuBar;
+			sourceTree = "<group>";
+		};
+		GRP_MODELS /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				F003 /* Models.swift */,
+			);
+			name = Models;
+			path = Sources/YaHome/Models;
+			sourceTree = "<group>";
+		};
+		GRP_ROOT = {
+			isa = PBXGroup;
+			children = (
+				GRP_APP /* App */,
+				GRP_MODELS /* Models */,
+				GRP_SERVICES /* Services */,
+				GRP_VIEWS /* Views */,
+				GRP_MENU /* MenuBar */,
+				FPROD /* YaHome.app */,
+			);
+			sourceTree = "<group>";
+		};
+		GRP_SERVICES /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				F004 /* APIService.swift */,
+				F005 /* KeychainService.swift */,
+				F006 /* HistoryService.swift */,
+			);
+			name = Services;
+			path = Sources/YaHome/Services;
+			sourceTree = "<group>";
+		};
+		GRP_VIEWS /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				F007 /* AuthView.swift */,
+				F008 /* DashboardView.swift */,
+				F009 /* DeviceCardView.swift */,
+				F010 /* SensorHistoryView.swift */,
+			);
+			name = Views;
+			path = Sources/YaHome/Views;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		TGT /* YaHome */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = CFGTGT /* Build configuration list for PBXNativeTarget "YaHome" */;
+			buildPhases = (
+				PH_SRC /* Sources */,
+				PH_FW /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = YaHome;
+			productName = YaHome;
+			productReference = FPROD /* YaHome.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		PROJ /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1600;
+				LastUpgradeCheck = 1600;
+				TargetAttributes = {
+					TGT = {
+						CreatedOnToolsVersion = 16.0;
+					};
+				};
+			};
+			buildConfigurationList = CFGPROJ /* Build configuration list for PBXProject "YaHome" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = GRP_ROOT;
+			productRefGroup = GRP_ROOT;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				TGT /* YaHome */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		PH_SRC /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A001 /* YaHomeApp.swift in Sources */,
+				A002 /* AppState.swift in Sources */,
+				A003 /* Models.swift in Sources */,
+				A004 /* APIService.swift in Sources */,
+				A005 /* KeychainService.swift in Sources */,
+				A006 /* HistoryService.swift in Sources */,
+				A007 /* AuthView.swift in Sources */,
+				A008 /* DashboardView.swift in Sources */,
+				A009 /* DeviceCardView.swift in Sources */,
+				A010 /* SensorHistoryView.swift in Sources */,
+				A011 /* MenuBarManager.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		CFG_PROJ_DBG /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		CFG_PROJ_REL /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = macosx;
+				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
+			};
+			name = Release;
+		};
+		CFG_TGT_DBG /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = YaHome.entitlements;
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				INFOPLIST_FILE = Sources/YaHome/Resources/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.onegamerstory.yahome;
+				PRODUCT_NAME = YaHome;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		CFG_TGT_REL /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = YaHome.entitlements;
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				INFOPLIST_FILE = Sources/YaHome/Resources/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.onegamerstory.yahome;
+				PRODUCT_NAME = YaHome;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		CFGPROJ /* Build configuration list for PBXProject "YaHome" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CFG_PROJ_DBG /* Debug */,
+				CFG_PROJ_REL /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		CFGTGT /* Build configuration list for PBXNativeTarget "YaHome" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CFG_TGT_DBG /* Debug */,
+				CFG_TGT_REL /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = PROJ /* Project object */;
+}
