@@ -19,6 +19,7 @@
 		A010 /* SensorHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F010 /* SensorHistoryView.swift */; };
 		A011 /* MenuBarManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F011 /* MenuBarManager.swift */; };
 		A012 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F012 /* SettingsView.swift */; };
+		A013 /* AppIcon.icns in Resources */ = {isa = PBXBuildFile; fileRef = F013 /* AppIcon.icns */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -34,6 +35,7 @@
 		F010 /* SensorHistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SensorHistoryView.swift; sourceTree = "<group>"; };
 		F011 /* MenuBarManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarManager.swift; sourceTree = "<group>"; };
 		F012 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		F013 /* AppIcon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = AppIcon.icns; sourceTree = "<group>"; };
 		FPROD /* YaHome.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = YaHome.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -46,6 +48,17 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXResourcesBuildPhase section */
+		PH_RES /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A013 /* AppIcon.icns in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
 
 /* Begin PBXGroup section */
 		GRP_APP /* App */ = {
@@ -76,6 +89,15 @@
 			path = Sources/YaHome/Models;
 			sourceTree = "<group>";
 		};
+		GRP_RESOURCES /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				F013 /* AppIcon.icns */,
+			);
+			name = Resources;
+			path = Sources/YaHome/Resources;
+			sourceTree = "<group>";
+		};
 		GRP_ROOT = {
 			isa = PBXGroup;
 			children = (
@@ -84,6 +106,7 @@
 				GRP_SERVICES /* Services */,
 				GRP_VIEWS /* Views */,
 				GRP_MENU /* MenuBar */,
+				GRP_RESOURCES /* Resources */,
 				FPROD /* YaHome.app */,
 			);
 			sourceTree = "<group>";
@@ -121,6 +144,7 @@
 			buildPhases = (
 				PH_SRC /* Sources */,
 				PH_FW /* Frameworks */,
+				PH_RES /* Resources */,
 			);
 			buildRules = (
 			);
@@ -232,6 +256,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
+				ICON_FILE = AppIcon;
 				INFOPLIST_FILE = Sources/YaHome/Resources/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -253,6 +278,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
+				ICON_FILE = AppIcon;
 				INFOPLIST_FILE = Sources/YaHome/Resources/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",

@@ -25,6 +25,8 @@
 		<key>NSAllowsArbitraryLoads</key>
 		<true/>
 	</dict>
+	<key>CFBundleIconFile</key>
+	<string>AppIcon</string>
 	<key>NSHumanReadableCopyright</key>
 	<string>© 2026 История Одного Геймера</string>
 </dict>
